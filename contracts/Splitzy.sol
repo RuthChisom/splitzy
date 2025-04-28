@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol"; //to interact with stab
 // }
 
 contract Splitzy {
+    IERC20 public cUSDToken; // token to call transfer() on
 
     // Address of the cUSD token contract on Celo Mainnet or Alfajores Testnet
     address public cUSDTokenAddress;
@@ -17,7 +18,7 @@ contract Splitzy {
     uint public billCount;
 
     constructor(address _cUSDTokenAddress) {
-        cUSDTokenAddress = _cUSDTokenAddress;
+        cUSDToken = IERC20(_cUSDTokenAddress);
     }
 
     // Struct for a group
