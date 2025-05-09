@@ -1,4 +1,4 @@
-// scripts/deploy.js
+import {ethers} from "hardhat";
 
 async function main() {
     const cUSDCoinAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // cUSD on Alfajores (testnet)

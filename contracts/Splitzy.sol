@@ -66,36 +66,32 @@ contract Splitzy {
     function createBill(
         uint _groupId,
         string memory _title,
-        uint _totalAmount,
-        address[] memory _payees,
-        uint[] memory _amounts
-    ) external {
-        require(groups[_groupId].id != 0, "Group does not exist.");
-        require(_payees.length == _amounts.length, "Payees and amounts length mismatch.");
+        uint _totalAmount
+        ) external {
+            require(groups[_groupId].id != 0, "Group does not exist.");
+            require(groups[_groupId].members.length > 0, "Group has no members.");
 
-        billCount++;
-        Bill storage bill = bills[billCount];
-        bill.id = billCount;
-        bill.groupId = _groupId;
-        bill.title = _title;
-        bill.totalAmount = _totalAmount;
-        bill.creator = msg.sender;
-        bill.payees = _payees;
+            billCount++;
+            Bill storage bill = bills[billCount];
+            bill.id = billCount;
+            bill.groupId = _groupId;
+            bill.title = _title;
+            bill.totalAmount = _totalAmount;
+            bill.creator = msg.sender;
+            bill.payees = groups[_groupId].members;
 
-        uint totalSplitAmount = 0;
-        for (uint i = 0; i < _payees.length; i++) {
-            bill.amountOwed[_payees[i]] = _amounts[i];
-            bill.hasPaid[_payees[i]] = false;
-            totalSplitAmount += _amounts[i];
+            uint share = _totalAmount / groups[_groupId].members.length;
 
-            // Track each user's bills
-            userBills[_payees[i]].push(billCount);
-        }
+            for (uint i = 0; i < groups[_groupId].members.length; i++) {
+                address payee = groups[_groupId].members[i];
+                bill.amountOwed[payee] = share;
+                bill.hasPaid[payee] = false;
+                userBills[payee].push(billCount);
+            }
 
-        require(totalSplitAmount == _totalAmount, "Split amounts do not match total.");
-
-        emit BillCreated(billCount, _groupId, _title, _totalAmount);
+            emit BillCreated(billCount, _groupId, _title, _totalAmount);
     }
+
 
     // Pay a bill
     function payBill(uint _billId) external {
